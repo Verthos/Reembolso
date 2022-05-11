@@ -12,7 +12,7 @@ namespace MtgDataAPI.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().Navigation(u => u.refounds).AutoInclude();
-            modelBuilder.Entity<User>().Navigation(u => u.subordinates).AutoInclude();
+            //modelBuilder.Entity<User>().Navigation(u => u.subordinates).AutoInclude();
             modelBuilder.Entity<Refund>().Navigation(r => r.items).AutoInclude();
         }
         public DbSet<User> Users { get; set; }

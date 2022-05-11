@@ -150,9 +150,6 @@ namespace Reembolso.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("isAdmin")
                         .HasColumnType("bit");
 
@@ -163,8 +160,6 @@ namespace Reembolso.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Users");
                 });
@@ -185,13 +180,6 @@ namespace Reembolso.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Reembolso.Models.User", b =>
-                {
-                    b.HasOne("Reembolso.Models.User", null)
-                        .WithMany("subordinates")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("Reembolso.Models.Refund", b =>
                 {
                     b.Navigation("items");
@@ -200,8 +188,6 @@ namespace Reembolso.Migrations
             modelBuilder.Entity("Reembolso.Models.User", b =>
                 {
                     b.Navigation("refounds");
-
-                    b.Navigation("subordinates");
                 });
 #pragma warning restore 612, 618
         }

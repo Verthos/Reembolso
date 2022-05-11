@@ -2,6 +2,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using MtgDataAPI.Data;
+using Reembolso.Repository;
+using Reembolso.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddDbContext<ReembolsoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<ReembolsoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 

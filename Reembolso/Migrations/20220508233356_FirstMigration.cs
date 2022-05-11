@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Reembolso.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class FirstMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -39,17 +39,11 @@ namespace Reembolso.Migrations
                     ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ManagerId = table.Column<int>(type: "int", nullable: false),
                     Department = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    DepartmentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -107,11 +101,6 @@ namespace Reembolso.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Refunds_UserId",
                 table: "Refunds",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_UserId",
-                table: "Users",
                 column: "UserId");
         }
 
