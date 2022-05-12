@@ -25,7 +25,7 @@ namespace Reembolso.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public ActionResult<IEnumerable<User>> GetUsers()
         {
             IEnumerable<User> users = _db.GetAll();
             return Ok(users);

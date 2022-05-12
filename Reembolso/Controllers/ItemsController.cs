@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MtgDataAPI.Data;
 using Reembolso.Models;
+using Reembolso.Repository.IRepository;
 
 namespace Reembolso.Controllers
 {
@@ -15,95 +16,57 @@ namespace Reembolso.Controllers
     [ApiController]
     public class ItemsController : ControllerBase
     {
-        private readonly ReembolsoContext _context;
+        private readonly IItemsRepository _db;
 
-        public ItemsController(ReembolsoContext context)
+        public ItemsController(IItemsRepository db)
         {
-            _context = context;
+            _db = db;
         }
-
         // GET: api/Items
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Item>>> GetItems()
+        public ActionResult<IEnumerable<Item>> GetItems()
         {
-            return await _context.Items.ToListAsync();
+            IEnumerable<Item> items = _db.GetAll();
+            return Ok(items);
         }
-
-        // GET: api/Items/5
+        // GET: api/Items/2
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetItem(int id)
+        public ActionResult<Item> GetItem(int id)
         {
-            var item = await _context.Items.FindAsync(id);
-
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            return item;
-        }
-
-        // PUT: api/Items/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutItem(int id, Item item)
-        {
-            if (id != item.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(item).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(_db.GetFirstOrDefault(e => e.Id == id));
         }
 
         // POST: api/Items
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Item>> PostItem(Item item)
+        public ActionResult<Item> PostItem(Item item)
         {
-            _context.Items.Add(item);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetItem", new { id = item.Id }, item);
+            _db.Add(item);
+            _db.Save();
+            return Created("Item adicionado", item);
         }
 
-        // DELETE: api/Items/5
+        // PUT: api/Item/2
+        [HttpPut("{id}")]
+        public ActionResult<Item> UpdateItem(Item item)
+        {
+            _db.Update(item);
+            _db.Save();
+            return Ok($"Item id: {item.Id} atualizado.");
+        }
+
+        // DELETE: api/Item/2
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteItem(int id)
+        public ActionResult<Item> DeleteItem(int Id)
         {
-            var item = await _context.Items.FindAsync(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
+            Item item = _db.GetFirstOrDefault(e => e.Id==Id);
+            _db.Remove(item);
+            _db.Save();
 
-            _context.Items.Remove(item);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok($"Item id: {item.Id} removido com sucesso.");
         }
 
-        private bool ItemExists(int id)
-        {
-            return _context.Items.Any(e => e.Id == id);
-        }
+        
+
+
     }
 }

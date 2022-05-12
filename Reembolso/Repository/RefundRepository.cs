@@ -4,10 +4,10 @@ using Reembolso.Repository.IRepository;
 
 namespace Reembolso.Repository
 {
-    public class UserRepository : Repository<User>, IUserRepository
+    public class RefundRepository : Repository<Refund>, IRefundRepository
     {
         private readonly ReembolsoContext _db;
-        public UserRepository(ReembolsoContext db) : base(db)
+        public RefundRepository(ReembolsoContext db) : base(db)
         {
             _db = db;
         }
@@ -18,9 +18,9 @@ namespace Reembolso.Repository
             _db.SaveChanges();
         }
 
-        public void Update(User user)
+        public void Update(Refund refund)
         {
-            _db.Users.Update(user);
+            _db.Update(refund);
         }
     }
 }
