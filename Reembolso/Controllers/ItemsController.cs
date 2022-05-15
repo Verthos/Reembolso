@@ -65,8 +65,5 @@ namespace Reembolso.Controllers
             return Ok($"Item id: {item.Id} removido com sucesso.");
         }
 
-        
-
-
     }
 }

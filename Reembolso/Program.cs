@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MtgDataAPI.Data;
 using Reembolso.Repository;
 using Reembolso.Repository.IRepository;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +14,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers().AddJsonOptions(x =>x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); // entender erro de 
 builder.Services.AddDbContext<ReembolsoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IItemsRepository, ItemsRepository>();
+builder.Services.AddScoped<IRefundRepository, RefundRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();

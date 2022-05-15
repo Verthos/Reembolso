@@ -12,7 +12,7 @@ using MtgDataAPI.Data;
 namespace Reembolso.Migrations
 {
     [DbContext(typeof(ReembolsoContext))]
-    [Migration("20220508233356_FirstMigration")]
+    [Migration("20220514154028_FirstMigration")]
     partial class FirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,7 +68,7 @@ namespace Reembolso.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RefundId")
+                    b.Property<int>("RefundId")
                         .HasColumnType("int");
 
                     b.Property<double>("Value")
@@ -89,21 +89,17 @@ namespace Reembolso.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime>("ClosingDate")
+                    b.Property<DateTime?>("ClosingDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("TotalValue")
-                        .HasColumnType("float");
-
-                    b.Property<int>("UserId")
+                    b.Property<int?>("OwnerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double?>("TotalValue")
+                        .HasColumnType("float");
 
                     b.Property<int>("aprovingId")
                         .HasColumnType("int");
@@ -113,7 +109,7 @@ namespace Reembolso.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Refunds");
                 });
@@ -127,7 +123,6 @@ namespace Reembolso.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Department")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DepartmentId")
@@ -137,6 +132,15 @@ namespace Reembolso.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDirector")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsManager")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -145,21 +149,11 @@ namespace Reembolso.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ManagerName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isAdmin")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isDirector")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isManager")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -168,23 +162,27 @@ namespace Reembolso.Migrations
 
             modelBuilder.Entity("Reembolso.Models.Item", b =>
                 {
-                    b.HasOne("Reembolso.Models.Refund", null)
-                        .WithMany("items")
-                        .HasForeignKey("RefundId");
-                });
-
-            modelBuilder.Entity("Reembolso.Models.Refund", b =>
-                {
-                    b.HasOne("Reembolso.Models.User", null)
-                        .WithMany("refounds")
-                        .HasForeignKey("UserId")
+                    b.HasOne("Reembolso.Models.Refund", "ParendRefund")
+                        .WithMany("Items")
+                        .HasForeignKey("RefundId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ParendRefund");
                 });
 
             modelBuilder.Entity("Reembolso.Models.Refund", b =>
                 {
-                    b.Navigation("items");
+                    b.HasOne("Reembolso.Models.User", "Owner")
+                        .WithMany("refounds")
+                        .HasForeignKey("OwnerId");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Reembolso.Models.Refund", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Reembolso.Models.User", b =>

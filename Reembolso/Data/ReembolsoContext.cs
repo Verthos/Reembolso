@@ -13,7 +13,7 @@ namespace MtgDataAPI.Data
         {
             modelBuilder.Entity<User>().Navigation(u => u.refounds).AutoInclude();
             //modelBuilder.Entity<User>().Navigation(u => u.subordinates).AutoInclude();
-            modelBuilder.Entity<Refund>().Navigation(r => r.items).AutoInclude();
+            modelBuilder.Entity<Refund>().Navigation(r => r.Items).AutoInclude();
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Refund> Refunds{ get; set; }

@@ -17,10 +17,12 @@ namespace Reembolso.Controllers
     public class RefundsController : ControllerBase
     {
         private readonly IRefundRepository _db;
+        private readonly IUserRepository _userDb;
 
-        public RefundsController(IRefundRepository db)
+        public RefundsController(IRefundRepository db, IUserRepository userDb)
         {
             _db = db;
+            _userDb = userDb;
         }
         
         // GET : api/Refounds
@@ -39,11 +41,21 @@ namespace Reembolso.Controllers
 
         // POST : api/Refunds
         [HttpPost]
-        public ActionResult<Refund> CreateRefund(Refund refund)
+        public ActionResult<Refund> CreateRefund(Refund refund,int ownerId)
         {
+            foreach (Item item in refund.Items)
+            {
+                item.ParendRefund = refund;
+            }
+
+            refund.TotalValue = refund.CalculateTotalValue(refund.Items);
+            refund.Owner = _userDb.GetFirstOrDefault(o => o.Id == ownerId);
+            refund.CreationDate = DateTime.Now;
+
+
             _db.Add(refund);
             _db.Save();
-            return CreatedAtAction("Reembolso criado", refund);
+            return Created("Reembolso criado", refund.Id);
         }
 
         // PUT : api/Refunds/2
@@ -51,6 +63,7 @@ namespace Reembolso.Controllers
         public ActionResult<Refund> UpdateRefund(Refund refund)
         {
             _db.Update(refund);
+            _db.Save();
             return Ok($"Reembolso id: {refund.Id} atualizado.");
         }
 
@@ -59,8 +72,41 @@ namespace Reembolso.Controllers
         public ActionResult<Refund> DeleteRefund(int id)
         {
             _db.Remove(_db.GetFirstOrDefault(r => r.Id == id));
-            return Ok($"Reembolso id: {id}removido");
+            _db.Save();
+            return Ok($"Reembolso id: {id} removido");
         }
+
+
+
+
+
+        // PUT: api/Refund/authorize/2
+        [HttpPut("authorize/{id}")]
+        public ActionResult<Refund> AuthorizeRefund(int id)
+        {
+            _db.AuthorizeRefund(id);
+            _db.Save();
+            return Ok($"Reembolso id: {id} autorizado");
+        }
+
+        // PUT: api/Refund/review/2
+        [HttpPut("review/{id}")]
+        public ActionResult<Refund> SendRefundToReview(int id)
+        {
+            _db.SendRefundToReview(id);
+            _db.Save();
+            return Ok($"Reembolso id: {id} enviado para revisão");
+        }
+
+        // PUT: api/Refund/deny/2
+        [HttpPut("deny/{id}")]
+        public ActionResult<Refund> DenyRefund(int id)
+        {
+            _db.DenyRefund(id);
+            _db.Save();
+            return Ok($"Reembolso id: {id} reprovado");
+        }
+
     }
 
 }

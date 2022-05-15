@@ -54,7 +54,7 @@ namespace Reembolso.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<User> PostUser(User user)
+        public ActionResult<User> CreateUser(User user)
         {
             try
             {
@@ -72,7 +72,6 @@ namespace Reembolso.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteUser(int id)
         {
-            
             _db.Remove(_db.GetFirstOrDefault(e => e.Id == id));
             _db.Save();
             return Ok($"User id:{id} was deleted");

@@ -33,12 +33,12 @@ namespace Reembolso.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    isAdmin = table.Column<bool>(type: "bit", nullable: false),
-                    isManager = table.Column<bool>(type: "bit", nullable: false),
-                    isDirector = table.Column<bool>(type: "bit", nullable: false),
-                    ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: false),
+                    IsManager = table.Column<bool>(type: "bit", nullable: false),
+                    IsDirector = table.Column<bool>(type: "bit", nullable: false),
+                    ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ManagerId = table.Column<int>(type: "int", nullable: false),
-                    Department = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DepartmentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -53,22 +53,20 @@ namespace Reembolso.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClosingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClosingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     aprovingStatus = table.Column<int>(type: "int", nullable: false),
                     aprovingId = table.Column<int>(type: "int", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    TotalValue = table.Column<double>(type: "float", nullable: false)
+                    TotalValue = table.Column<double>(type: "float", nullable: true),
+                    OwnerId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Refunds", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Refunds_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Refunds_Users_OwnerId",
+                        column: x => x.OwnerId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -81,7 +79,7 @@ namespace Reembolso.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Value = table.Column<double>(type: "float", nullable: false),
                     ReceiptPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RefundId = table.Column<int>(type: "int", nullable: true)
+                    RefundId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,7 +88,8 @@ namespace Reembolso.Migrations
                         name: "FK_Items_Refunds_RefundId",
                         column: x => x.RefundId,
                         principalTable: "Refunds",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -99,9 +98,9 @@ namespace Reembolso.Migrations
                 column: "RefundId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Refunds_UserId",
+                name: "IX_Refunds_OwnerId",
                 table: "Refunds",
-                column: "UserId");
+                column: "OwnerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

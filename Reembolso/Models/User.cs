@@ -26,7 +26,6 @@
             this.ManagerId = managerId;
             this.DepartmentId = departmentId;
             this.refounds = new List<Refund>();
-
         }
     }
 
