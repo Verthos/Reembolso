@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Reembolso.Models;
+using Reembolso.Repository.IRepository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,64 +15,58 @@ namespace Reembolso.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-
-        private readonly IConfiguration _config;
-        public AuthController(IConfiguration configuration)
+        private readonly IUserRepository _users;
+        private IConfiguration _config;
+        public AuthController(IConfiguration config, IUserRepository users)
         {
-            _config = configuration;
-        }
-
-
-        private string CreateToken(IEnumerable<Claim> claims, DateTime expiresAt)
-        {
-            var secretKey = Encoding.ASCII.GetBytes(_config.GetValue<string>("SecretKey"));
-            var jwt = new JwtSecurityToken(
-                claims: claims,
-                notBefore: DateTime.Now,
-                expires: expiresAt,
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature));
-
-            return new JwtSecurityTokenHandler().WriteToken(jwt);
+            _users = users;
+            _config = config;
         }
 
 
 
 
+
+        [AllowAnonymous]
         [HttpPost]
-        public IActionResult Authenticate([FromBody] Credential credential)
+        public IActionResult Authenticate(string userName, string mail)
         {
-
-            //verify credential
-
-            if(credential.UserName == "admin" && credential.Password == "password")
+            var user = AuthenticateUser(userName, mail);
+            if (user != null)
             {
-                //Creating the security context
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, "admin"),
-                    new Claim(ClaimTypes.Email, "admin@email.com.br"),
-                    new Claim("Department", "admin"),
-                    new Claim("Admin", "true"),
-                    new Claim("Manager", "true")                    
-                };
-
-                var expiresAt = DateTime.Now.AddMinutes(10);
-                return Ok(new
-                {
-                    access_token = CreateToken(claims, expiresAt),
-                    expires_at = expiresAt,
-                });
-                
+                var token = GenerateToken(user);
+                return Ok(token);
             }
-            ModelState.AddModelError("Unauthorized", "You are not authorized to access the endpoint.");
-            return Unauthorized(ModelState);
+            return NotFound("User not found");
         }
 
-
-        public class Credential
+        private User AuthenticateUser(string user, string password)
         {
-            public string UserName { get; set; }
-            public string Password { get; set; }
+            User currentUser = _users.GetFirstOrDefault(u => u.Name == user && u.Email == password);
+            if (currentUser != null)
+            {
+                return currentUser;
+            }
+            return null;
+        }
+
+        private string GenerateToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.GivenName, user.Name.ToLower()),
+                new Claim(ClaimTypes.Role, user.Department),
+            };
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+                _config["Jwt.Audience"],
+                claims,
+                expires: DateTime.Now.AddMinutes(15),
+                signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

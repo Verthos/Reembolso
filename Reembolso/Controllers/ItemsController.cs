@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +24,32 @@ namespace Reembolso.Controllers
         {
             _db = db;
         }
+
+        private User GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var userClaims = identity.Claims;
+                User newUser = new User(
+                    userClaims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value,
+                    "test claim", 
+                    userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value,1,1);
+                return newUser;
+            }
+            return null;
+        }
+
         // GET: api/Items
         [HttpGet]
+        [Authorize]
         public ActionResult<IEnumerable<Item>> GetItems()
         {
+            var currentUser = GetCurrentUser();
             IEnumerable<Item> items = _db.GetAll();
-            return Ok(items);
+            return Ok($"Hi {currentUser.Name} youre authenticaded with your email {currentUser.Email} {items}");
         }
+
         // GET: api/Items/2
         [HttpGet("{id}")]
         public ActionResult<Item> GetItem(int id)
