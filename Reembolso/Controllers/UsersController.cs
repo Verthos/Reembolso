@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MtgDataAPI.Data;
@@ -17,9 +18,11 @@ namespace Reembolso.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _db;
+        private IPasswordHasher<User> _hasher;
 
-        public UsersController(IUserRepository db)
+        public UsersController(IUserRepository db, IPasswordHasher<User> hasher)
         {
+            _hasher = hasher;
             _db = db;
         }
 
@@ -56,9 +59,12 @@ namespace Reembolso.Controllers
         [HttpPost]
         public ActionResult<User> CreateUser(User user)
         {
+            User newUser = user;
+            newUser.Password = _hasher.HashPassword(newUser, newUser.Password);
+
             try
             {
-                _db.Add(user);
+                _db.Add(newUser);
                 _db.Save();
                 return Created("Usuário criado: ", user);
             }

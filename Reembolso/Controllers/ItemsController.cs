@@ -25,29 +25,20 @@ namespace Reembolso.Controllers
             _db = db;
         }
 
-        private User GetCurrentUser()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
-            {
-                var userClaims = identity.Claims;
-                User newUser = new User(
-                    userClaims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value,
-                    "test claim", 
-                    userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value,1,1);
-                return newUser;
-            }
-            return null;
-        }
-
         // GET: api/Items
         [HttpGet]
         [Authorize]
         public ActionResult<IEnumerable<Item>> GetItems()
         {
-            var currentUser = GetCurrentUser();
-            IEnumerable<Item> items = _db.GetAll();
-            return Ok($"Hi {currentUser.Name} youre authenticaded with your email {currentUser.Email} {items}");
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            {
+                IEnumerable<Item> items = _db.GetAll();
+                return Ok(items);
+            } else
+            {
+                throw new UnauthorizedAccessException("Você não está autorizado para acessar essa informação, contate um administrador");
+            }
         }
 
         // GET: api/Items/2
@@ -82,7 +73,6 @@ namespace Reembolso.Controllers
             Item item = _db.GetFirstOrDefault(e => e.Id==Id);
             _db.Remove(item);
             _db.Save();
-
             return Ok($"Item id: {item.Id} removido com sucesso.");
         }
 

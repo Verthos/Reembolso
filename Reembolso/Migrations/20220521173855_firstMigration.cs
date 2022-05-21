@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Reembolso.Migrations
 {
-    public partial class FirstMigration : Migration
+    public partial class firstMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -31,7 +31,8 @@ namespace Reembolso.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsAdmin = table.Column<bool>(type: "bit", nullable: false),
                     IsManager = table.Column<bool>(type: "bit", nullable: false),
@@ -54,7 +55,6 @@ namespace Reembolso.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ClosingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    aprovingStatus = table.Column<int>(type: "int", nullable: false),
                     aprovingId = table.Column<int>(type: "int", nullable: false),
                     TotalValue = table.Column<double>(type: "float", nullable: true),
                     OwnerId = table.Column<int>(type: "int", nullable: true)

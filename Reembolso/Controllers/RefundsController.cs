@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,22 +43,43 @@ namespace Reembolso.Controllers
 
         // POST : api/Refunds
         [HttpPost]
-        public ActionResult<Refund> CreateRefund(Refund refund,int ownerId)
+        [Authorize]
+        public ActionResult<Refund> CreateRefund(Refund refund)
         {
-            foreach (Item item in refund.Items)
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            Int32.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
+
+            if (identity == null)
             {
-                item.ParendRefund = refund;
+                throw new UnauthorizedAccessException("Você não está autorizado, contate um administrador");
             }
+            try
+            {
+                foreach (Item item in refund.Items)
+                {
+                    item.ParendRefund = refund;
+                }
 
-            refund.TotalValue = refund.CalculateTotalValue(refund.Items);
-            refund.Owner = _userDb.GetFirstOrDefault(o => o.Id == ownerId);
-            refund.CreationDate = DateTime.Now;
+                refund.TotalValue = refund.CalculateTotalValue(refund.Items);
+                refund.Owner = _userDb.GetFirstOrDefault(o => o.Id == ownerId);
+                refund.CreationDate = DateTime.Now;
 
 
-            _db.Add(refund);
-            _db.Save();
-            return Created("Reembolso criado", refund.Id);
+                _db.Add(refund);
+                _db.Save();
+                return Created("Reembolso criado", refund.Id);
+            } catch (Exception ex)
+            {
+                return BadRequest($"Erro: {ex.Message} contate um administrador");
+            }
+            
         }
+
+
+
+
+
 
         // PUT : api/Refunds/2
         [HttpPut("{id}")]
