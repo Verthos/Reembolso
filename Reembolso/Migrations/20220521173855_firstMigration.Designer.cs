@@ -12,8 +12,8 @@ using MtgDataAPI.Data;
 namespace Reembolso.Migrations
 {
     [DbContext(typeof(ReembolsoContext))]
-    [Migration("20220514154028_FirstMigration")]
-    partial class FirstMigration
+    [Migration("20220521173855_firstMigration")]
+    partial class firstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -104,9 +104,6 @@ namespace Reembolso.Migrations
                     b.Property<int>("aprovingId")
                         .HasColumnType("int");
 
-                    b.Property<int>("aprovingStatus")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
@@ -142,7 +139,6 @@ namespace Reembolso.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ManagerId")
@@ -152,6 +148,10 @@ namespace Reembolso.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

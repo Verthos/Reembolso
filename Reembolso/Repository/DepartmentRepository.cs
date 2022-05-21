@@ -19,7 +19,7 @@ namespace Reembolso.Repository
 
         public void Update(Department department)
         {
-            
+            _db.Update(department);
         }
     }
 }

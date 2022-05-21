@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +24,23 @@ namespace Reembolso.Controllers
         {
             _db = db;
         }
+
         // GET: api/Items
         [HttpGet]
+        [Authorize]
         public ActionResult<IEnumerable<Item>> GetItems()
         {
-            IEnumerable<Item> items = _db.GetAll();
-            return Ok(items);
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            {
+                IEnumerable<Item> items = _db.GetAll();
+                return Ok(items);
+            } else
+            {
+                throw new UnauthorizedAccessException("Você não está autorizado para acessar essa informação, contate um administrador");
+            }
         }
+
         // GET: api/Items/2
         [HttpGet("{id}")]
         public ActionResult<Item> GetItem(int id)
@@ -61,7 +73,6 @@ namespace Reembolso.Controllers
             Item item = _db.GetFirstOrDefault(e => e.Id==Id);
             _db.Remove(item);
             _db.Save();
-
             return Ok($"Item id: {item.Id} removido com sucesso.");
         }
 

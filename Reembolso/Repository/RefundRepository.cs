@@ -26,7 +26,7 @@ namespace Reembolso.Repository
             Refund? refund = _db.Refunds.FirstOrDefault(r => r.Id == id);
             if (refund != null)
             {
-                refund.aprovingId = 2;
+                refund.AprovingId = 2;
                 refund.ClosingDate = DateTime.Now;
                 _db.Update(refund);
             }
@@ -41,7 +41,7 @@ namespace Reembolso.Repository
             Refund? refund = _db.Refunds.FirstOrDefault(r => r.Id == id);
             if (refund != null)
             {
-                refund.aprovingId = 3;
+                refund.AprovingId = 3;
                 _db.Update(refund);
             }
             else
@@ -55,7 +55,7 @@ namespace Reembolso.Repository
             Refund? refund = _db.Refunds.FirstOrDefault(r => r.Id == id);
             
             if(refund != null)
-            {   refund.aprovingId = 4;
+            {   refund.AprovingId = 4;
                 refund.ClosingDate = DateTime.Now;
                 _db.Update(refund);
             }
