@@ -19,9 +19,11 @@ namespace Reembolso.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IItemsRepository _db;
+        private readonly IUserRepository _userDb;
 
-        public ItemsController(IItemsRepository db)
+        public ItemsController(IItemsRepository db, IUserRepository userDb)
         {
+            _userDb = userDb;
             _db = db;
         }
 
@@ -31,30 +33,15 @@ namespace Reembolso.Controllers
         public ActionResult<IEnumerable<Item>> GetItems()
         {
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            if (_userDb.IsDirectorOrAdmin(identity))
             {
                 IEnumerable<Item> items = _db.GetAll();
                 return Ok(items);
-            } else
-            {
-                throw new UnauthorizedAccessException("Você não está autorizado para acessar essa informação, contate um administrador");
             }
-        }
-
-        // GET: api/Items/2
-        [HttpGet("{id}")]
-        public ActionResult<Item> GetItem(int id)
-        {
-            return Ok(_db.GetFirstOrDefault(e => e.Id == id));
-        }
-
-        // POST: api/Items
-        [HttpPost]
-        public ActionResult<Item> PostItem(Item item)
-        {
-            _db.Add(item);
-            _db.Save();
-            return Created("Item adicionado", item);
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
         }
 
         // PUT: api/Item/2

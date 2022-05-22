@@ -29,16 +29,38 @@ namespace Reembolso.Controllers
         
         // GET : api/Refounds
         [HttpGet]
+        [Authorize]
         public ActionResult<IEnumerable<Refund>> GetRefunds()
         {
-            return Ok(_db.GetAll());
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if(identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            {
+                return Ok(_db.GetAll());
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
         }
 
         // GET : api/Refunds/2
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<Refund> GetRefund(int id)
         {
-            return Ok(_db.GetFirstOrDefault(r => r.Id == id));
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            _ = int.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
+            Refund refund = _db.GetFirstOrDefault(r => r.Id == id);
+
+
+            if (_userDb.IsOwnerOrAdmin(identity, refund.OwnerId))
+            {
+                return Ok(refund);
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
         }
 
         // POST : api/Refunds
@@ -47,18 +69,18 @@ namespace Reembolso.Controllers
         public ActionResult<Refund> CreateRefund(Refund refund)
         {
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            Int32.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
+            _ = int.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
 
             if (identity == null)
             {
-                throw new UnauthorizedAccessException("Você não está autorizado, contate um administrador");
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
             }
             try
             {
                 foreach (Item item in refund.Items)
                 {
                     item.ParendRefund = refund;
+                    item.ParentUserId = ownerId;
                 }
 
                 refund.TotalValue = refund.CalculateTotalValue(refund.Items);
@@ -77,59 +99,114 @@ namespace Reembolso.Controllers
         }
 
 
-
-
-
-
         // PUT : api/Refunds/2
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult<Refund> UpdateRefund(Refund refund)
         {
-            _db.Update(refund);
-            _db.Save();
-            return Ok($"Reembolso id: {refund.Id} atualizado.");
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (_userDb.IsOwnerOrAdmin(identity, refund.OwnerId))
+            {
+                _db.Update(refund);
+                _db.Save();
+                return Ok($"Reembolso id: {refund.Id} atualizado.");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }            
         }
 
         // DELETE : api/Refunds/2
         [HttpDelete("{id}")]
-        public ActionResult<Refund> DeleteRefund(int id)
+        [Authorize]
+        public ActionResult<Refund> DeleteRefund(Refund refund)
         {
-            _db.Remove(_db.GetFirstOrDefault(r => r.Id == id));
-            _db.Save();
-            return Ok($"Reembolso id: {id} removido");
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (_userDb.IsOwnerOrAdmin(identity, refund.OwnerId))
+            {
+                _db.Remove(_db.GetFirstOrDefault(r => r.Id == refund.Id));
+                _db.Save();
+                return Ok($"Reembolso id: {refund.Id} removido");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }            
         }
-
-
-
 
 
         // PUT: api/Refund/authorize/2
         [HttpPut("authorize/{id}")]
+        [Authorize]
         public ActionResult<Refund> AuthorizeRefund(int id)
         {
-            _db.AuthorizeRefund(id);
-            _db.Save();
-            return Ok($"Reembolso id: {id} autorizado");
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (_userDb.IsDepartmentManagerOrAdmin(identity))
+            {
+                _db.AuthorizeRefund(id);
+                _db.Save();
+                return Ok($"Reembolso id: {id} autorizado");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
         }
 
         // PUT: api/Refund/review/2
         [HttpPut("review/{id}")]
+        [Authorize]
         public ActionResult<Refund> SendRefundToReview(int id)
         {
-            _db.SendRefundToReview(id);
-            _db.Save();
-            return Ok($"Reembolso id: {id} enviado para revisão");
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (_userDb.IsDepartmentManagerOrAdmin(identity))
+            {
+                _db.SendRefundToReview(id);
+                _db.Save();
+                return Ok($"Reembolso id: {id} enviado para revisão");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
+
+            
         }
 
         // PUT: api/Refund/deny/2
         [HttpPut("deny/{id}")]
+        [Authorize]
         public ActionResult<Refund> DenyRefund(int id)
         {
-            _db.DenyRefund(id);
-            _db.Save();
-            return Ok($"Reembolso id: {id} reprovado");
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (_userDb.IsDepartmentManagerOrAdmin(identity))
+            {
+                _db.DenyRefund(id);
+                _db.Save();
+                return Ok($"Reembolso id: {id} reprovado");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
         }
-
+        // PUT: api/Refund/deny/2
+        [HttpPut("payment/{id}")]
+        [Authorize]
+        public ActionResult<Refund> SendRefundToPayment(int id)
+        {
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (_userDb.IsDirectorOrAdmin(identity))
+            {
+                _db.SendRefundToPayment(id);
+                _db.Save();
+                return Ok($"Reembolso id: {id} enviado para pagamento");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
+        }
     }
-
 }

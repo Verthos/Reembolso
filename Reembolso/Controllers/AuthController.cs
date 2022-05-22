@@ -68,7 +68,7 @@ namespace Reembolso.Controllers
                 new Claim(ClaimTypes.GivenName, user.Name.ToLower()),
                 new Claim(ClaimTypes.Role, role),
                 new Claim("UserId", user.Id.ToString()),
-                new Claim("Department", user.Department)
+                //new Claim("Department", user.Department.Name)
             };
 
 

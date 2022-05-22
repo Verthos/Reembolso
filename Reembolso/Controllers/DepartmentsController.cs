@@ -43,10 +43,8 @@ namespace Reembolso.Controllers
         [HttpPost]
         public ActionResult<Department> CreateDepartment(Department department)
         {
-
             _db.Add(department);
             _db.Save();
-
             return Created("Departamento criado", department);
         }
 

@@ -12,7 +12,7 @@ using MtgDataAPI.Data;
 namespace Reembolso.Migrations
 {
     [DbContext(typeof(ReembolsoContext))]
-    [Migration("20220521173855_firstMigration")]
+    [Migration("20220522184944_firstMigration")]
     partial class firstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,10 +34,6 @@ namespace Reembolso.Migrations
 
                     b.Property<int>("ManagerId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ManagerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -64,6 +60,9 @@ namespace Reembolso.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ParentUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ReceiptPath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -89,20 +88,20 @@ namespace Reembolso.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AprovingId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ClosingDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("OwnerId")
+                    b.Property<int>("OwnerId")
                         .HasColumnType("int");
 
                     b.Property<double?>("TotalValue")
                         .HasColumnType("float");
-
-                    b.Property<int>("aprovingId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -119,10 +118,7 @@ namespace Reembolso.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Department")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DepartmentId")
+                    b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -141,12 +137,6 @@ namespace Reembolso.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ManagerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ManagerName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -155,7 +145,12 @@ namespace Reembolso.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("login")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Users");
                 });
@@ -174,10 +169,26 @@ namespace Reembolso.Migrations
             modelBuilder.Entity("Reembolso.Models.Refund", b =>
                 {
                     b.HasOne("Reembolso.Models.User", "Owner")
-                        .WithMany("refounds")
-                        .HasForeignKey("OwnerId");
+                        .WithMany("Refounds")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Reembolso.Models.User", b =>
+                {
+                    b.HasOne("Reembolso.Models.Department", "Department")
+                        .WithMany("Users")
+                        .HasForeignKey("DepartmentId");
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("Reembolso.Models.Department", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Reembolso.Models.Refund", b =>
@@ -187,7 +198,7 @@ namespace Reembolso.Migrations
 
             modelBuilder.Entity("Reembolso.Models.User", b =>
                 {
-                    b.Navigation("refounds");
+                    b.Navigation("Refounds");
                 });
 #pragma warning restore 612, 618
         }

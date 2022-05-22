@@ -1,4 +1,5 @@
-﻿namespace Reembolso.Models
+﻿
+namespace Reembolso.Models
 {
     public class Item
     {
@@ -9,5 +10,6 @@
         public string ReceiptPath { get; set; }
         public int RefundId { get; set; }
         public Refund? ParendRefund { get; set; }
+        public int? ParentUserId { get; set; }
     }
 }

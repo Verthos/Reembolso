@@ -11,6 +11,7 @@ namespace Reembolso.Repository
         {
             _db = db;
         }
+
         public void Save()
         {
             _db.SaveChanges();
@@ -20,7 +21,7 @@ namespace Reembolso.Repository
             _db.Update(refund);
         }
 
-        // 1: Pendente, 2: Aprovado, 3: Revisão do usuário, 4: Reprovado; 
+        // 1: Pendente, 2: Aprovado, 3: Revisão do usuário, 4: Reprovado, 5: Enviado para pagamento; 
         public void AuthorizeRefund(int id)
         {
             Refund? refund = _db.Refunds.FirstOrDefault(r => r.Id == id);
@@ -64,6 +65,23 @@ namespace Reembolso.Repository
                 throw new KeyNotFoundException($"Id {id} não encontrado");
             }
             
+        }
+
+
+        public void SendRefundToPayment(int id)
+        {
+            Refund? refund = _db.Refunds.FirstOrDefault(r => r.Id == id);
+
+            if (refund != null)
+            {
+                refund.AprovingId = 5;
+                refund.ClosingDate = DateTime.Now;
+                _db.Update(refund);
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Id {id} não encontrado");
+            }
         }
     }
 }

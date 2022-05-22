@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +20,7 @@ namespace Reembolso.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _db;
-        private IPasswordHasher<User> _hasher;
+        private readonly IPasswordHasher<User> _hasher;
 
         public UsersController(IUserRepository db, IPasswordHasher<User> hasher)
         {
@@ -28,59 +30,106 @@ namespace Reembolso.Controllers
 
         // GET: api/Users
         [HttpGet]
+        [Authorize]
         public ActionResult<IEnumerable<User>> GetUsers()
         {
-            IEnumerable<User> users = _db.GetAll();
-            return Ok(users);
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            {
+                IEnumerable<User> users = _db.GetAll();
+                return Ok(users);
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
+            
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<User> GetUser(int id)
         {
-            return Ok(_db.GetFirstOrDefault(u => u.Id == id));
-
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            {
+                return Ok(_db.GetFirstOrDefault(u => u.Id == id));
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
+            
         }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult PutUser(int id, User user)
         {
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            {
+                _db.Update(user);
+                _db.Save();
+                return Ok($"User id: {id} updated");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
 
-            _db.Update(user);
-            _db.Save();
-            return Ok($"User id: {id} updated");
+            
 
         }
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public ActionResult<User> CreateUser(User user)
         {
-            User newUser = user;
-            newUser.Password = _hasher.HashPassword(newUser, newUser.Password);
-
-            try
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
             {
-                _db.Add(newUser);
-                _db.Save();
-                return Created("Usuário criado: ", user);
+                User newUser = user;
+                newUser.Password = _hasher.HashPassword(newUser, newUser.Password);
+                newUser.login = user.Name[0].ToString().ToLower() + user.LastName.ToLower();
+                try
+                {
+                    _db.Add(newUser);
+                    _db.Save();
+                    return Created("Usuario criado", new { Message = $"Usuário de nome {user.login} criado" });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return BadRequest(ex.Message);
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
             }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize]
         public ActionResult DeleteUser(int id)
         {
-            _db.Remove(_db.GetFirstOrDefault(e => e.Id == id));
-            _db.Save();
-            return Ok($"User id:{id} was deleted");
+            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+            {
+                _db.Remove(_db.GetFirstOrDefault(e => e.Id == id));
+                _db.Save();
+                return Ok($"User id:{id} was deleted");
+            }
+            else
+            {
+                return Unauthorized("Não autorizado. Entre em contato com um administrador");
+            }
         }
 
     }
