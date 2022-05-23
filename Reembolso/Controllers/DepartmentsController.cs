@@ -27,25 +27,47 @@ namespace Reembolso.Controllers
         [HttpGet]
         public ActionResult<Department> GetDepartments()
         {
+            try
+            {
             IEnumerable<Department> departmentList = _db.GetAll();
             return Ok(departmentList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET : api/departments/2
         [HttpGet("{id}")]
         public ActionResult<Department> GetDepartment(int id)
         {
-            Department department = _db.GetFirstOrDefault(d=> d.Id == id);
-            return Ok(department);
+            try
+            {
+                Department department = _db.GetFirstOrDefault(d => d.Id == id);
+                return Ok(department);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         // POST : api/departments
         [HttpPost]
         public ActionResult<Department> CreateDepartment(Department department)
         {
+            try
+            {
             _db.Add(department);
             _db.Save();
             return Created("Departamento criado", department);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }
