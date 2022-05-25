@@ -14,7 +14,7 @@ namespace Reembolso.Models
         }
 
         public int Id { get; set; }
-        public List<Item> Items { get; set; }
+        public List<Item> Items { get; set; } = new List<Item>();
         public DateTime CreationDate { get; set; }
         public DateTime? ClosingDate { get; set; }
         public int AprovingId { get; set; } = 1; // 1: Pendente, 2: Aprovado, 3: Revisão do usuário, 4: Reprovado, 5: Enviado para pagamento; 

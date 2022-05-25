@@ -1,5 +1,5 @@
 
-
+global using Reembolso.Services.EmailService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +28,7 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IRefundRepository, RefundRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 //foi necessário adicionar este campo para requisições do mesmo terminal, junto da variavel MyAllowSpecificOrigins e o middleware UseCors (DOC: https://docs.microsoft.com/pt-br/aspnet/core/security/cors?view=aspnetcore-6.0)
 builder.Services.AddCors(options =>
