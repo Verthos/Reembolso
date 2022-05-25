@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MtgDataAPI.Data;
 using Reembolso.Auth;
+using Reembolso.Data;
 using Reembolso.Models;
 using Reembolso.Repository;
 using Reembolso.Repository.IRepository;
@@ -14,7 +14,7 @@ using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var MyAllowSpecificOrigins = "http://localhost:3000";
+var MyAllowSpecificOrigins = "https://localhost:7089/_blazor";
 // Add services to the container.
 builder.Services.AddMvc();
 builder.Services.AddControllers();

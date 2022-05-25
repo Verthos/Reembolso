@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Reembolso.Models;
 
-namespace MtgDataAPI.Data
+namespace Reembolso.Data
 
 {
     public class ReembolsoContext : DbContext
@@ -18,7 +18,7 @@ namespace MtgDataAPI.Data
 
         }
         public DbSet<User> Users { get; set; }
-        public DbSet<Refund> Refunds{ get; set; }
+        public DbSet<Refund> Refunds { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<Department> departments { get; set; }
 
