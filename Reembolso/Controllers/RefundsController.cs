@@ -19,11 +19,13 @@ namespace Reembolso.Controllers
     {
         private readonly IRefundRepository _db;
         private readonly IUserRepository _userDb;
+        private readonly IEmailService _emailService;
 
-        public RefundsController(IRefundRepository db, IUserRepository userDb)
+        public RefundsController(IRefundRepository db, IUserRepository userDb, EmailService emailService)
         {
             _db = db;
             _userDb = userDb;
+            _emailService = emailService;
         }
         
         // GET : api/Refounds
