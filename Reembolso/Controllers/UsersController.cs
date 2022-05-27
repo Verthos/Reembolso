@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Reembolso.Models;
-using Reembolso.Repository.IRepository;
+using Refund.Core.Interfaces.Repositories;
 
 namespace Reembolso.Controllers
 {

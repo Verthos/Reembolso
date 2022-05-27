@@ -5,9 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Reembolso.Models;
-using Reembolso.Repository.IRepository;
+using Refunds.Core.Entities;
+using Refunds.Core.Interfaces.Repositories;
 
 namespace Reembolso.Controllers
 {
