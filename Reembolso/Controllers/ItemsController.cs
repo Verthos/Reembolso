@@ -8,10 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Reembolso.Models;
-using Refund.Core.Interfaces.Repositories;
 using Refunds.Core.Entities;
 using Refunds.Core.Interfaces.Repositories;
+using Refunds.Infrastructure.Auth.VerifyUserRole;
 
 namespace Reembolso.Controllers
 {
@@ -20,12 +19,12 @@ namespace Reembolso.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IItemsRepository _db;
-        private readonly IUserRepository _userDb;
+        private readonly IVerifyUserRole _verify;
 
-        public ItemsController(IItemsRepository db, IUserRepository userDb)
+        public ItemsController(IItemsRepository db, IVerifyUserRole verify)
         {
-            _userDb = userDb;
             _db = db;
+            _verify = verify;
         }
 
         // GET: api/Items
@@ -36,7 +35,7 @@ namespace Reembolso.Controllers
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
             try
             {
-                if (_userDb.IsDirectorOrAdmin(identity))
+                if (_verify.IsDirectorOrAdmin(identity))
                 {
                     IEnumerable<Item> items = _db.GetAll();
                     return Ok(items);

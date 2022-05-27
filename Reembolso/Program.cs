@@ -7,6 +7,7 @@ using Refunds.Core.Entities;
 using Refunds.Core.Interfaces.Repositories;
 using Refunds.Infrastructure;
 using Refunds.Infrastructure.Auth;
+using Refunds.Infrastructure.Auth.VerifyUserRole;
 using Refunds.Infrastructure.Persistence.Repositories;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -23,6 +24,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>x.JsonSerializerOptions.Ref
 builder.Services.AddDbContext<ReembolsoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IItemsRepository, ItemsRepository>();
 builder.Services.AddScoped<IAuth, Auth>();
+builder.Services.AddScoped<IVerifyUserRole, VerifyUserRole>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IRefundRepository, RefundRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

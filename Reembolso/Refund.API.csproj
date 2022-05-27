@@ -25,6 +25,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Refund.Core\Refunds.Core.csproj" />
     <ProjectReference Include="..\Refund.Infrastructure\Refunds.Infrastructure.csproj" />
+    <ProjectReference Include="..\Refunds.Application\Refunds.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Filters\" />
   </ItemGroup>
 
 </Project>
