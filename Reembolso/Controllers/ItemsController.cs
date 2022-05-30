@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Refunds.Application.Auth.VerifyUserRole;
 using Refunds.Core.Entities;
 using Refunds.Core.Interfaces.Repositories;
-using Refunds.Infrastructure.Auth.VerifyUserRole;
 
 namespace Reembolso.Controllers
 {
@@ -53,6 +53,7 @@ namespace Reembolso.Controllers
 
         // PUT: api/Item/2
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult<Item> UpdateItem(Item item)
         {
             try
@@ -69,6 +70,7 @@ namespace Reembolso.Controllers
 
         // DELETE: api/Item/2
         [HttpDelete("{id}")]
+        [Authorize]
         public ActionResult<Item> DeleteItem(int Id)
         {
             try

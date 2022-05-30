@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reembolso.API", "Reembolso\Reembolso.API.csproj", "{5800066B-0293-4334-91F5-3828D93D4BF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refund.API", "Reembolso\Refund.API.csproj", "{5800066B-0293-4334-91F5-3828D93D4BF6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8D2B6AC8-439A-480B-ABEA-D417C0B6195E}"
 EndProject
@@ -11,9 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5BFF4D61
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refunds.Core", "Refund.Core\Refunds.Core.csproj", "{D37F2BF9-B9DD-4D4B-92BF-7CDD498D2C94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refunds.Infrastructure", "Refund.Infrastructure\Refunds.Infrastructure.csproj", "{35C93AEE-151E-4152-BE75-DFE0F9EDBCA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refunds.Infrastructure", "Refund.Infrastructure\Refunds.Infrastructure.csproj", "{35C93AEE-151E-4152-BE75-DFE0F9EDBCA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refunds.Application", "Refunds.Application\Refunds.Application.csproj", "{83D1449E-F1AC-49E7-BAD5-3AF622C5F549}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refunds.Application", "Refunds.Application\Refunds.Application.csproj", "{83D1449E-F1AC-49E7-BAD5-3AF622C5F549}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

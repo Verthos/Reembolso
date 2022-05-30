@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Refunds.Core.Entities;
-using Refunds.Infrastructure.Auth;
+using Refunds.Core.Interfaces.Auth;
 
 
 namespace Reembolso.Controllers
@@ -10,8 +10,8 @@ namespace Reembolso.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuth _auth;
-        public AuthController(IAuth auth)
+        private readonly IAuth<User> _auth;
+        public AuthController(IAuth<User> auth)
         {
             _auth = auth;
         }

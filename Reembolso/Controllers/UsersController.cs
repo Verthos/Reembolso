@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Refunds.Application.ViewModels;
 using Refunds.Core.Entities;
 using Refunds.Core.Interfaces.Repositories;
 
@@ -30,7 +31,7 @@ namespace Reembolso.Controllers
         // GET: api/Users
         [HttpGet]
         [Authorize]
-        public ActionResult<IEnumerable<User>> GetUsers()
+        public ActionResult<IEnumerable<UserViewModel>> GetUsers()
         {
             try
             {
@@ -55,7 +56,7 @@ namespace Reembolso.Controllers
         // GET: api/Users/5
         [HttpGet("{id}")]
         [Authorize]
-        public ActionResult<User> GetUser(int id)
+        public ActionResult<UserViewModel> GetUser(int id)
         {
             try
             {

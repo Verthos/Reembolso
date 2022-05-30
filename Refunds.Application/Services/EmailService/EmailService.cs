@@ -2,13 +2,13 @@
 using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
-using Reembolso.Services.EmailService;
 using Microsoft.Extensions.Configuration;
 using Refunds.Core.Entities;
+using Refunds.Core.Interfaces.Email;
 
 namespace Refunds.Application.Services.EmailService
 {
-    public class EmailService : IEmailService
+    public class EmailService : IEmailService<Email>
     {
         private readonly IConfiguration _config;
         public EmailService(IConfiguration config)

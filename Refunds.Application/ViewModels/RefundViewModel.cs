@@ -1,26 +1,18 @@
-﻿namespace Refunds.Application.ViewModels
+﻿using Refunds.Core.Entities;
+
+namespace Refunds.Application.ViewModels
 {
     public class RefundViewModel
     {
-        public double CalculateTotalValue(List<ItemInputViewModel> items)
-        {
-            double totalValue = 0;
-            foreach (ItemInputViewModel item in items)
-            {
-                totalValue += item.Value;
-            }
-            return totalValue;
-        }
-
-        public int Id { get; set; }
-        public List<ItemInputViewModel> Items { get; set; } = new List<ItemInputViewModel>();
-        public DateTime CreationDate { get; set; }
-        public DateTime? ClosingDate { get; set; }
-        public int AprovingId { get; set; } = 1; // 1: Pendente, 2: Aprovado, 3: Revisão do usuário, 4: Reprovado, 5: Enviado para pagamento; 
-        public double? TotalValue { get; set; }
+        public int Id { get; }
+        public List<Item> Items { get; } = new List<Item>();
+        public DateTime CreationDate { get; }
+        public DateTime? ClosingDate { get; }
+        public int AprovingId { get; } = 1; // 1: Pendente, 2: Aprovado, 3: Revisão do usuário, 4: Reprovado, 5: Enviado para pagamento; 
+        public double? TotalValue { get; }
 
         //Navigation
-        public UserViewModel? Owner { get; set; }
-        public int OwnerId { get; internal set; }
+        public UserViewModel? Owner { get; }
+        public int OwnerId { get; }
     }
 }

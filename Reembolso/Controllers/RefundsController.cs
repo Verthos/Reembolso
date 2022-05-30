@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Refunds.Application.Auth.VerifyUserRole;
+using Refunds.Application.ViewModels;
 using Refunds.Core.Entities;
 using Refunds.Core.Interfaces.Repositories;
-using Refunds.Infrastructure.Auth.VerifyUserRole;
 
 namespace Reembolso.Controllers
 {
@@ -32,7 +33,7 @@ namespace Reembolso.Controllers
         // GET : api/Refounds
         [HttpGet]
         [Authorize]
-        public ActionResult<IEnumerable<Refund>> GetRefunds()
+        public ActionResult<IEnumerable<RefundViewModel>> GetRefunds()
         {
 
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -56,13 +57,12 @@ namespace Reembolso.Controllers
 
         // GET : api/Refunds/2
         [HttpGet("{id}")]
-        [Authorize]
-        public ActionResult<Refund> GetRefund(int id)
+        public ActionResult<RefundViewModel> GetRefund(int id)
         {
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
             try
             {
-                _ = int.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
+                //_ = int.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
                 Refund refund = _db.GetFirstOrDefault(r => r.Id == id);
 
 
@@ -79,6 +79,7 @@ namespace Reembolso.Controllers
             {
                 return BadRequest(ex.Message);
             }
+
         }
 
         // POST : api/Refunds

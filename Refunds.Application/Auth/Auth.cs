@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Refunds.Core.Entities;
+using Refunds.Core.Interfaces.Auth;
 using Refunds.Core.Interfaces.Repositories;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Refunds.Infrastructure.Auth
+namespace Refunds.Application.Auth
 {
-    public class Auth : IAuth
+    public class Auth : IAuth<User>
     {
         private readonly IUserRepository _users;
         private readonly IConfiguration _config;
@@ -36,8 +38,6 @@ namespace Refunds.Infrastructure.Auth
                 throw new Exception("Usuário ou senha incorretos.");
             };
         }
-
-
 
         public string GenerateToken(User user)
         {

@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-namespace Refunds.Infrastructure.Auth.VerifyUserRole
+namespace Refunds.Application.Auth.VerifyUserRole
 {
     public interface IVerifyUserRole
     {
