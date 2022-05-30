@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Reembolso.Models;
-using Reembolso.Repository.IRepository;
+using Refunds.Application.Auth.VerifyUserRole;
+using Refunds.Core.Entities;
+using Refunds.Core.Interfaces.Repositories;
 
 namespace Reembolso.Controllers
 {
@@ -18,12 +19,12 @@ namespace Reembolso.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IItemsRepository _db;
-        private readonly IUserRepository _userDb;
+        private readonly IVerifyUserRole _verify;
 
-        public ItemsController(IItemsRepository db, IUserRepository userDb)
+        public ItemsController(IItemsRepository db, IVerifyUserRole verify)
         {
-            _userDb = userDb;
             _db = db;
+            _verify = verify;
         }
 
         // GET: api/Items
@@ -34,7 +35,7 @@ namespace Reembolso.Controllers
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
             try
             {
-                if (_userDb.IsDirectorOrAdmin(identity))
+                if (_verify.IsDirectorOrAdmin(identity))
                 {
                     IEnumerable<Item> items = _db.GetAll();
                     return Ok(items);
@@ -52,6 +53,7 @@ namespace Reembolso.Controllers
 
         // PUT: api/Item/2
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult<Item> UpdateItem(Item item)
         {
             try
@@ -68,6 +70,7 @@ namespace Reembolso.Controllers
 
         // DELETE: api/Item/2
         [HttpDelete("{id}")]
+        [Authorize]
         public ActionResult<Item> DeleteItem(int Id)
         {
             try

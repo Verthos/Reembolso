@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Reembolso.Models;
-using Reembolso.Repository.IRepository;
+using Refunds.Application.Auth.VerifyUserRole;
+using Refunds.Application.ViewModels;
+using Refunds.Core.Entities;
+using Refunds.Core.Interfaces.Repositories;
 
 namespace Reembolso.Controllers
 {
@@ -19,19 +21,19 @@ namespace Reembolso.Controllers
     {
         private readonly IRefundRepository _db;
         private readonly IUserRepository _userDb;
-        private readonly IEmailService _emailService;
+        private readonly IVerifyUserRole _verify;
 
-        public RefundsController(IRefundRepository db, IUserRepository userDb, EmailService emailService)
+        public RefundsController(IRefundRepository db, IUserRepository userDb, IVerifyUserRole verify)
         {
             _db = db;
             _userDb = userDb;
-            _emailService = emailService;
+            _verify = verify;
         }
         
         // GET : api/Refounds
         [HttpGet]
         [Authorize]
-        public ActionResult<IEnumerable<Refund>> GetRefunds()
+        public ActionResult<IEnumerable<RefundViewModel>> GetRefunds()
         {
 
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -55,17 +57,16 @@ namespace Reembolso.Controllers
 
         // GET : api/Refunds/2
         [HttpGet("{id}")]
-        [Authorize]
-        public ActionResult<Refund> GetRefund(int id)
+        public ActionResult<RefundViewModel> GetRefund(int id)
         {
             ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
             try
             {
-                _ = int.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
+                //_ = int.TryParse(identity.Claims.FirstOrDefault(c => c.Type == "UserId").Value, out int ownerId);
                 Refund refund = _db.GetFirstOrDefault(r => r.Id == id);
 
 
-                if (_userDb.IsOwnerOrAdmin(identity, refund.OwnerId))
+                if (_verify.IsOwnerOrAdmin(identity, refund.OwnerId))
                 {
                     return Ok(refund);
                 }
@@ -78,6 +79,7 @@ namespace Reembolso.Controllers
             {
                 return BadRequest(ex.Message);
             }
+
         }
 
         // POST : api/Refunds
@@ -125,7 +127,7 @@ namespace Reembolso.Controllers
             try
             {
                 ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-                if (_userDb.IsOwnerOrAdmin(identity, refund.OwnerId))
+                if (_verify.IsOwnerOrAdmin(identity, refund.OwnerId))
                 {
                     _db.Update(refund);
                     _db.Save();
@@ -151,7 +153,7 @@ namespace Reembolso.Controllers
             try
             {
                 ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-                if (_userDb.IsOwnerOrAdmin(identity, refund.OwnerId))
+                if (_verify.IsOwnerOrAdmin(identity, refund.OwnerId))
                 {
                     _db.Remove(_db.GetFirstOrDefault(r => r.Id == refund.Id));
                     _db.Save();
@@ -178,7 +180,7 @@ namespace Reembolso.Controllers
             try
             {
                 ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-                if (_userDb.IsDepartmentManagerOrAdmin(identity))
+                if (_verify.IsDepartmentManagerOrAdmin(identity))
                 {
                     _db.AuthorizeRefund(id);
                     _db.Save();
@@ -204,7 +206,7 @@ namespace Reembolso.Controllers
             try
             {
                 ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-                if (_userDb.IsDepartmentManagerOrAdmin(identity))
+                if (_verify.IsDepartmentManagerOrAdmin(identity))
                 {
                     _db.SendRefundToReview(id);
                     _db.Save();
@@ -231,7 +233,7 @@ namespace Reembolso.Controllers
             try
             {
                 ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-                if (_userDb.IsDepartmentManagerOrAdmin(identity))
+                if (_verify.IsDepartmentManagerOrAdmin(identity))
                 {
                     _db.DenyRefund(id);
                     _db.Save();
@@ -255,7 +257,7 @@ namespace Reembolso.Controllers
             try
             {
                 ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-                if (_userDb.IsDirectorOrAdmin(identity))
+                if (_verify.IsDirectorOrAdmin(identity))
                 {
                     _db.SendRefundToPayment(id);
                     _db.Save();

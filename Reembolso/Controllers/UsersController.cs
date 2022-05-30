@@ -9,8 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Reembolso.Models;
-using Reembolso.Repository.IRepository;
+using Refunds.Application.ViewModels;
+using Refunds.Core.Entities;
+using Refunds.Core.Interfaces.Repositories;
 
 namespace Reembolso.Controllers
 {
@@ -29,33 +30,33 @@ namespace Reembolso.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public ActionResult<IEnumerable<User>> GetUsers()
+        [Authorize]
+        public ActionResult<IEnumerable<UserViewModel>> GetUsers()
         {
-            //try
-            //{
-            //    ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-            //    if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
-            //    {
-            //        IEnumerable<User> users = _db.GetAll();
-            //        return Ok(users);
-            //    }
-            //    else
-            //    {
-            //        return Unauthorized("Não autorizado. Entre em contato com um administrador");
-            //    }
-            //}catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
-            IEnumerable<User> users = _db.GetAll();
-            return Ok(users);
+            try
+            {
+                ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin")
+                {
+                    IEnumerable<User> users = _db.GetAll();
+                    return Ok(users);
+                }
+                else
+                {
+                    return Unauthorized("Não autorizado. Entre em contato com um administrador");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         [Authorize]
-        public ActionResult<User> GetUser(int id)
+        public ActionResult<UserViewModel> GetUser(int id)
         {
             try
             {

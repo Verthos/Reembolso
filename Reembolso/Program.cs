@@ -1,20 +1,21 @@
 
-global using Reembolso.Services.EmailService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Reembolso.Auth;
-using Reembolso.Data;
-using Reembolso.Models;
-using Reembolso.Repository;
-using Reembolso.Repository.IRepository;
+using Refunds.Application.Auth;
+using Refunds.Application.Auth.VerifyUserRole;
+using Refunds.Core.Entities;
+using Refunds.Core.Interfaces.Auth;
+using Refunds.Core.Interfaces.Repositories;
+using Refunds.Infrastructure;
+using Refunds.Infrastructure.Persistence.Repositories;
 using System.Text;
 using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var MyAllowSpecificOrigins = "https://localhost:7089/_blazor";
+var MyAllowSpecificOrigins = "http://localhost:3000";
 // Add services to the container.
 builder.Services.AddMvc();
 builder.Services.AddControllers();
@@ -23,12 +24,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddJsonOptions(x =>x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); // entender erro de 
 builder.Services.AddDbContext<ReembolsoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IItemsRepository, ItemsRepository>();
-builder.Services.AddScoped<IAuth, Auth>();
+builder.Services.AddScoped<IAuth<User>, Auth>();
+builder.Services.AddScoped<IVerifyUserRole, VerifyUserRole>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IRefundRepository, RefundRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<IEmailService, EmailService>();
 
 //foi necessário adicionar este campo para requisições do mesmo terminal, junto da variavel MyAllowSpecificOrigins e o middleware UseCors (DOC: https://docs.microsoft.com/pt-br/aspnet/core/security/cors?view=aspnetcore-6.0)
 builder.Services.AddCors(options =>
